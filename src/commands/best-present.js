@@ -5,9 +5,38 @@ const { parseDescription, expandKeywords } = require('../lib/keyword-expander');
 const { sanitizeString } = require('../lib/sanitize');
 
 /**
+ * 驗證並正規化 --keywords 輸入
+ * - split by comma, trim, remove empty, dedupe（保留原順序）
+ * - 最多 10 組，每組 1–30 字，不含控制字元
+ * @param {string} raw
+ * @returns {string[]}
+ * @throws {Error}
+ */
+function parseKeywordsFlag(raw) {
+  const parts = raw.split(',')
+    .map(k => k.trim().replace(/[\x00-\x1f\x7f]/g, ''))
+    .filter(k => k.length > 0);
+
+  // 去重（保留原順序）
+  const seen = new Set();
+  const deduped = parts.filter(k => {
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+
+  if (deduped.length === 0) throw new Error('--keywords 不可為空');
+  if (deduped.length > 10) throw new Error(`--keywords 最多 10 組，收到 ${deduped.length} 組`);
+
+  for (const k of deduped) {
+    if (k.length > 30) throw new Error(`--keywords 單組不可超過 30 字：「${k.slice(0, 35)}…」`);
+  }
+
+  return deduped;
+}
+
+/**
  * 從 categories 陣列取出第一層 category key（正規化）
- * @param {Array} categories
- * @returns {string}
  */
 function normalizeCategoryKey(categories) {
   if (!Array.isArray(categories) || categories.length === 0) return '__unknown__';
@@ -20,10 +49,6 @@ function normalizeCategoryKey(categories) {
 
 /**
  * 並行搜尋多組 keywords，合併結果
- * @param {string[]} keywords
- * @param {object} opts - { timeout }
- * @param {boolean} debug
- * @returns {Promise<Array<{product, source_keyword}>>}
  */
 async function searchAll(keywords, opts, debug) {
   const results = await Promise.allSettled(
@@ -50,11 +75,6 @@ async function searchAll(keywords, opts, debug) {
 
 /**
  * 過濾 + 去重 + 排序
- * @param {Array} items - [{product, source_keyword}]
- * @param {number|null} budget
- * @param {number} count
- * @param {boolean} debug
- * @returns {{ recommendations, dropped }}
  */
 function dedupeAndRank(items, budget, count, debug) {
   const dropped = [];
@@ -69,14 +89,10 @@ function dedupeAndRank(items, budget, count, debug) {
     }
 
     const catKey = normalizeCategoryKey(p.categories);
-
-    if (!byCategory.has(catKey)) {
-      byCategory.set(catKey, []);
-    }
+    if (!byCategory.has(catKey)) byCategory.set(catKey, []);
     byCategory.get(catKey).push({ product: p, source_keyword, price });
   }
 
-  // 每個 category 選最佳一筆：離 budget 最近 → id asc
   const candidates = [];
   for (const [catKey, group] of byCategory.entries()) {
     group.sort((a, b) => {
@@ -100,7 +116,6 @@ function dedupeAndRank(items, budget, count, debug) {
     });
   }
 
-  // 穩定排序：price asc，再 sku asc
   candidates.sort((a, b) => {
     if (a.selling_price !== b.selling_price) return a.selling_price - b.selling_price;
     return String(a.sku).localeCompare(String(b.sku));
@@ -116,6 +131,7 @@ module.exports = function registerBestPresent(program) {
   program
     .command('best-present <description>')
     .description('依一句話描述，找出類別多樣的合適禮物')
+    .option('--keywords <keywords>', 'agent 直接傳入搜尋關鍵字（逗號分隔，bypass 規則式展開）')
     .option('--budget <number>', '單件預算上限（自動從描述解析，可覆蓋）', (v) => {
       const n = parseInt(v, 10);
       if (isNaN(n) || n <= 0) throw new Error('--budget 必須為正整數');
@@ -141,20 +157,27 @@ module.exports = function registerBestPresent(program) {
           return;
         }
 
-        // 解析 description
-        const parsed = parseDescription(cleanDesc);
-
-        // --budget 覆蓋描述解析出的值
-        const budget = opts.budget !== undefined ? opts.budget : parsed.budget;
-
-        if (opts.debug) {
-          process.stderr.write(`[debug] parsed: ${JSON.stringify({ ...parsed, budget })}\n`);
+        // --keywords 驗證（失敗直接 exit 1，不 silently fallback）
+        let keywords;
+        let planner;
+        if (opts.keywords !== undefined) {
+          keywords = parseKeywordsFlag(opts.keywords);
+          planner = 'agent';
+        } else {
+          const parsed = parseDescription(cleanDesc);
+          keywords = expandKeywords(parsed);
+          planner = 'rules';
         }
 
-        // 展開 keywords
-        const keywords = expandKeywords(parsed);
+        // --budget 覆蓋描述解析出的值（只在規則式模式下才解析描述）
+        let budget = opts.budget !== undefined ? opts.budget : null;
+        if (budget === null && planner === 'rules') {
+          const parsed = parseDescription(cleanDesc);
+          budget = parsed.budget;
+        }
+
         if (opts.debug) {
-          process.stderr.write(`[debug] keywords: ${keywords.join(', ')}\n`);
+          process.stderr.write(`[debug] planner=${planner} budget=${budget} keywords: ${keywords.join(', ')}\n`);
         }
 
         // 並行搜尋
@@ -169,7 +192,7 @@ module.exports = function registerBestPresent(program) {
           return;
         }
 
-        // --fields 遮罩
+        // --fields 遮罩（只作用於 recommendations[]，不影響 meta）
         const fields = opts.fields ? opts.fields.split(',').map(f => f.trim()) : null;
         const masked = recommendations.map(r => {
           if (!fields) return r;
@@ -179,26 +202,24 @@ module.exports = function registerBestPresent(program) {
         });
 
         // 輸出
-        const isJson = opts.json || (!opts.ndjson && !process.stdout.isTTY);
-        const isNdjson = opts.ndjson || (!opts.json && !process.stdout.isTTY);
-
         if (opts.json) {
           const out = {
             input: { description: cleanDesc, budget: budget ?? null, count: opts.count },
+            planner,
             keywords_used: keywords,
             recommendations: masked,
             dropped: opts.debug ? dropped : undefined,
           };
           process.stdout.write(JSON.stringify(out, null, 2) + '\n');
-        } else if (isNdjson) {
+        } else if (opts.ndjson || !process.stdout.isTTY) {
           for (const r of masked) {
             process.stdout.write(JSON.stringify(r) + '\n');
           }
         } else {
           // Human-readable TTY
           console.log(`\n🎁 依據：「${cleanDesc}」\n`);
-          if (budget) console.log(`   預算上限：NT$ ${budget}\n`);
-          console.log(`   使用關鍵字：${keywords.join('、')}\n`);
+          if (budget) console.log(`   預算上限：NT$ ${budget}`);
+          console.log(`   使用關鍵字：${keywords.join('、')}  [${planner}]\n`);
           console.log('─'.repeat(60));
           for (const [i, r] of masked.entries()) {
             console.log(`\n  ${i + 1}. ${r.name}`);
