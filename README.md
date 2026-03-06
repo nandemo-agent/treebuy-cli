@@ -53,3 +53,28 @@ treebuy-cli
 └── featured
     └── list [--kind featured|topic] [--json] [--fields <欄位>]
 ```
+
+## 搜尋指令
+
+```bash
+# 搜尋商品
+treebuy-cli search products "Dyson"
+
+# 分頁
+treebuy-cli search products "Dyson" --page 2 --limit 10
+
+# 排序（rank / price_asc / price_desc / new）
+treebuy-cli search products "Dyson" --sort-by price_asc
+
+# JSON 輸出（含 pagination）
+treebuy-cli search products "Dyson" --json
+
+# NDJSON（每筆一行，agent/pipe 友好）
+treebuy-cli search products "Dyson" --ndjson
+
+# 指定欄位
+treebuy-cli search products "Dyson" --fields id,name,selling_price,in_stock
+
+# 組合
+treebuy-cli search products "Dyson" --limit 5 --sort-by price_asc --fields id,name,selling_price --ndjson
+```
