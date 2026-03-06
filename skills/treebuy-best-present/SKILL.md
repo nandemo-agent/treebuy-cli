@@ -95,11 +95,11 @@ treebuy-cli best-present "<用戶原始描述>" \
 ```
 1. 光影香氛蠟燭（NT$ 499）
    送媽媽的母親節禮物，溫暖氛圍感十足，適合居家放鬆。
-   👉 https://www.treebuy.com/products/S251021874L1
+   👉 https://treebuy.com/product/S251021874L1
 
 2. 棉質絲巾（NT$ 580）
    實用又有質感，媽媽日常搭配或外出都適合。
-   👉 https://www.treebuy.com/products/S23020356755
+   👉 https://treebuy.com/product/S23020356755
 ```
 
 #### ❌ Bad response
@@ -170,7 +170,7 @@ treebuy-cli best-present "送同事禮物 500 元以內" \
 | `sku` | string | 商品 SKU（次要資訊） |
 | `name` | string | 商品名稱 |
 | `selling_price` | number | 售價 |
-| `product_url` | string | 商品頁連結（`treebuy.com/products/<sku>`） |
+| `product_url` | string | 商品頁連結（`treebuy.com/product/<sku>`） |
 | `source_keyword` | string | 來源關鍵字 |
 | `category_key` | string | 商品分類 key |
 | `in_stock` | boolean | 是否有庫存 |
