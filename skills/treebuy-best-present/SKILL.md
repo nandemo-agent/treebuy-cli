@@ -53,7 +53,7 @@ npx treebuy-cli best-present "..."
 ```bash
 # 用 --keywords 傳入你組好的關鍵字（bypass 規則式展開）
 treebuy-cli best-present "<用戶原始描述>" \
-  --keywords "<kw1>,<kw2>,<kw3>,...` \
+  --keywords "<kw1>,<kw2>,<kw3>,..." \
   --budget <number> \
   --count <number> \
   --json
