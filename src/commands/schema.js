@@ -14,7 +14,7 @@ const SCHEMAS = {
       { name: '--timeout', type: 'number', default: 10000, description: 'API timeout（毫秒）' },
     ],
     output_fields: {
-      'campaign': ['id', 'kind', 'started_at', 'ended_at', 'image_url', 'mobile_image_url', 'cta_button'],
+      'campaign': ['id', 'kind', 'started_at', 'ended_at', 'cta_button'],
       'campaign.products[]': ['sku', 'var_id', 'title', 'image_url', 'cta_open_in_new_window'],
     },
   },
