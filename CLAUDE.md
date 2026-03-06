@@ -18,8 +18,13 @@ src/
   commands/              # 每個子指令一個檔案
     featured.js          # featured list
     search.js            # search products
+skills/                  # Agent skill 目錄（canonical，用 npx skills add 安裝）
+  treebuy-featured/      # featured list skill
+  treebuy-search/        # search products skill
 package.json
 ```
+
+> ⚠️ 只有 `skills/` 是正規 skill 目錄。不要建立 `skill/` 或其他平行結構。
 
 ## API 端點（不變量）
 

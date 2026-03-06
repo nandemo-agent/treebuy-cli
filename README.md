@@ -78,3 +78,17 @@ treebuy-cli search products "Dyson" --fields id,name,selling_price,in_stock
 # 組合
 treebuy-cli search products "Dyson" --limit 5 --sort-by price_asc --fields id,name,selling_price --ndjson
 ```
+
+## Agent Skills
+
+透過 [`npx skills`](https://www.npmjs.com/package/skills) 分項安裝：
+
+```bash
+# Featured Campaign 技能
+npx skills add https://github.com/nandemo-agent/treebuy-cli --skill treebuy-featured
+
+# 搜尋商品技能
+npx skills add https://github.com/nandemo-agent/treebuy-cli --skill treebuy-search
+```
+
+Skills 位於 `skills/` 目錄（canonical），不要建立平行的 `skill/` 結構。
