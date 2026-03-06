@@ -1,0 +1,20 @@
+name: Check skill structure
+
+on:
+  pull_request:
+    paths:
+      - 'skill/**'
+      - 'skills/**'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reject legacy skill/ directory
+        run: |
+          if [ -d "skill" ]; then
+            echo "::error::Found legacy 'skill/' directory. The canonical skill path is 'skills/<skill-name>/'. Please remove 'skill/' and use 'skills/' instead."
+            exit 1
+          fi
+          echo "✅ No legacy skill/ directory found."
