@@ -1,6 +1,6 @@
 ---
 name: treebuy-featured
-description: 查詢小樹購（treebuy.com）目前的 Featured Campaign 商品清單。Use when: (1) 需要小樹購主打活動商品，(2) 查看當前 featured 或 topic campaign 有哪些商品，(3) 想知道活動 SKU、標題、期間。Triggers on: "小樹購 featured", "小樹購主打", "treebuy featured", "小樹購活動商品", "treebuy campaign"。
+description: "查詢小樹購（treebuy.com）目前的 Featured Campaign 商品清單。Use when: (1) 需要小樹購主打活動商品，(2) 查看當前 featured 或 topic campaign 有哪些商品，(3) 想知道活動 SKU、標題、期間。Triggers on: 小樹購 featured, 小樹購主打, treebuy featured, 小樹購活動商品, treebuy campaign。"
 ---
 
 # treebuy-featured
