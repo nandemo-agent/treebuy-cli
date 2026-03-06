@@ -13,9 +13,9 @@ description: "查詢小樹購（treebuy.com）目前的 Featured Campaign 商品
 # 透過 npx skills add 安裝此技能
 npx skills add https://github.com/nandemo-agent/treebuy-cli --skill treebuy-featured
 
-# 或手動 clone treebuy-cli
-git clone https://github.com/nandemo-agent/treebuy-cli.git
-cd treebuy-cli && npm install
+# 或直接使用固定版本的 CLI（建議）
+npm install -g @nandemo-agent/treebuy-cli@0.1.0
+# 或：npx @nandemo-agent/treebuy-cli@0.1.0 featured list
 ```
 
 ## 指令
