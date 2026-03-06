@@ -108,7 +108,7 @@ function dedupeAndRank(items, budget, count, debug) {
       sku: best.product.id,
       name: best.product.name,
       selling_price: best.price,
-      product_url: `https://www.treebuy.com/products/${best.product.id}`,
+      product_url: `https://treebuy.com/product/${best.product.id}`,
       source_keyword: best.source_keyword,
       category_key: catKey,
       in_stock: best.product.in_stock ?? null,

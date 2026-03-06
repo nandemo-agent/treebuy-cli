@@ -114,3 +114,14 @@ jobs:
             if (!d.output_fields || !d.output_fields['hits[]']) throw new Error('missing output_fields.hits[]');
             console.log('ok: schema --output contract passed');
           "
+
+      - name: best-present --json → product_url uses /product/
+        run: |
+          node bin/treebuy-cli.js best-present "送同事禮物 500 元以內" --keywords "馬克杯,茶葉,零食禮盒" --count 1 --json | node -e "
+            const d = JSON.parse(require('fs').readFileSync(0,'utf8'));
+            if (!Array.isArray(d.recommendations) || d.recommendations.length === 0) throw new Error('no recommendations');
+            const url = d.recommendations[0].product_url || '';
+            if (!url.includes('/product/')) throw new Error('product_url must contain /product/ path');
+            if (url.includes('/products/')) throw new Error('product_url must not contain /products/ path');
+            console.log('ok: best-present product_url path contract passed');
+          "
