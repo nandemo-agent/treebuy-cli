@@ -108,6 +108,7 @@ function dedupeAndRank(items, budget, count, debug) {
       sku: best.product.id,
       name: best.product.name,
       selling_price: best.price,
+      product_url: `https://www.treebuy.com/products/${best.product.id}`,
       source_keyword: best.source_keyword,
       category_key: catKey,
       in_stock: best.product.in_stock ?? null,
@@ -169,11 +170,14 @@ module.exports = function registerBestPresent(program) {
           planner = 'rules';
         }
 
-        // --budget 覆蓋描述解析出的值（只在規則式模式下才解析描述）
+        // --budget 覆蓋描述解析出的值；無論哪種 planner，都嘗試從描述解析
         let budget = opts.budget !== undefined ? opts.budget : null;
-        if (budget === null && planner === 'rules') {
+        if (budget === null) {
           const parsed = parseDescription(cleanDesc);
           budget = parsed.budget;
+          if (budget !== null && opts.debug) {
+            process.stderr.write(`[debug] budget 從描述解析：${budget}\n`);
+          }
         }
 
         if (opts.debug) {
@@ -225,8 +229,8 @@ module.exports = function registerBestPresent(program) {
             console.log(`\n  ${i + 1}. ${r.name}`);
             if (r.selling_price !== undefined) console.log(`     售價：NT$ ${r.selling_price}`);
             if (r.brand) console.log(`     品牌：${r.brand}`);
-            console.log(`     SKU：${r.sku}`);
-            console.log(`     關鍵字：${r.source_keyword}  分類：${r.category_key}`);
+            if (r.product_url) console.log(`     連結：${r.product_url}`);
+            console.log(`     SKU：${r.sku}  關鍵字：${r.source_keyword}`);
           }
           console.log('\n' + '─'.repeat(60) + '\n');
         }
