@@ -96,7 +96,7 @@ function dedupeAndRank(items, budget, count, debug) {
       category_key: catKey,
       in_stock: best.product.in_stock ?? null,
       brand: best.product.brand_show ?? null,
-      image_url: best.product.media_item ?? null,
+      image_url: best.product.media_item?.url ?? null,
     });
   }
 

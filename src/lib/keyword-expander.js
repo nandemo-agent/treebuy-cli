@@ -49,9 +49,16 @@ function parseDescription(description) {
   const recipient = recipientKeys.find(k => description.includes(k)) || null;
   const occasion = occasionKeys.find(k => description.includes(k)) || null;
 
-  // 解析預算：「預算 1000」「1000 元」「1000以內」「NT$1000」
-  const budgetMatch = description.match(/(?:預算|NT\$|NTD|￥)?\s*(\d+)\s*(?:元|以內|以下|左右)?/);
-  const budget = budgetMatch ? parseInt(budgetMatch[1], 10) : null;
+  // 解析預算，優先順序：每份 > 預算 > 一般金額（元/塊）
+  // 避免誤抓數量（「需要 10 份」）
+  let budget = null;
+  const perUnitMatch = description.match(/每[份件個]\s*(\d+)\s*(?:元|塊|以內|以下|左右)?/);
+  const budgetMatch = description.match(/預算\s*(?:NT\$|NTD|￥)?\s*(\d+)/);
+  const amountMatch = description.match(/(?:NT\$|NTD|￥)\s*(\d+)|(\d+)\s*(?:元|塊)(?:以內|以下|左右)?/);
+
+  if (perUnitMatch) budget = parseInt(perUnitMatch[1], 10);
+  else if (budgetMatch) budget = parseInt(budgetMatch[1], 10);
+  else if (amountMatch) budget = parseInt(amountMatch[1] || amountMatch[2], 10);
 
   return { recipient, occasion, budget };
 }
