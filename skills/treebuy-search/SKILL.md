@@ -1,6 +1,6 @@
 ---
 name: treebuy-search
-description: 依關鍵字搜尋小樹購（treebuy.com）商品，取得 SKU、名稱、售價、庫存等結構化資訊。Use when: (1) 搜尋小樹購商品，(2) 查詢特定品牌或類型商品清單，(3) 比較商品售價，(4) 需要商品 SKU 做後續處理。Triggers on: "搜尋小樹購", "找小樹購商品", "treebuy 搜尋", "小樹購找", "查小樹購庫存", "treebuy search"。
+description: "依關鍵字搜尋小樹購（treebuy.com）商品，取得 SKU、名稱、售價、庫存等結構化資訊。Use when: (1) 搜尋小樹購商品，(2) 查詢特定品牌或類型商品清單，(3) 比較商品售價，(4) 需要商品 SKU 做後續處理。Triggers on: 搜尋小樹購, 找小樹購商品, treebuy 搜尋, 小樹購找, 查小樹購庫存, treebuy search。"
 ---
 
 # treebuy-search
