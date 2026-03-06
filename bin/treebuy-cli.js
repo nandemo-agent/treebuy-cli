@@ -13,6 +13,7 @@ program
 require('../src/commands/featured')(program);
 require('../src/commands/search')(program);
 require('../src/commands/schema')(program);
+require('../src/commands/best-present')(program);
 
 program.parseAsync(process.argv).catch((err) => {
   process.stderr.write(`Error: ${err.message}\n`);
