@@ -12,4 +12,7 @@ program
 // 子指令
 require('../src/commands/featured')(program);
 
-program.parse(process.argv);
+program.parseAsync(process.argv).catch((err) => {
+  process.stderr.write(`Error: ${err.message}\n`);
+  process.exit(1);
+});
