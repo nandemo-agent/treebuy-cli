@@ -170,11 +170,14 @@ module.exports = function registerBestPresent(program) {
           planner = 'rules';
         }
 
-        // --budget 覆蓋描述解析出的值（只在規則式模式下才解析描述）
+        // --budget 覆蓋描述解析出的值；無論哪種 planner，都嘗試從描述解析
         let budget = opts.budget !== undefined ? opts.budget : null;
-        if (budget === null && planner === 'rules') {
+        if (budget === null) {
           const parsed = parseDescription(cleanDesc);
           budget = parsed.budget;
+          if (budget !== null && opts.debug) {
+            process.stderr.write(`[debug] budget 從描述解析：${budget}\n`);
+          }
         }
 
         if (opts.debug) {
