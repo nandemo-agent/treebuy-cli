@@ -17,9 +17,17 @@ npx skills add https://github.com/nandemo-agent/treebuy-cli --skill treebuy-best
 
 ```bash
 npm install -g treebuy-cli
-# 或直接 npx
-npx treebuy-cli best-present "..."
+# 或直接 npx（建議固定版本，避免 latest 漂移）
+npx treebuy-cli@<pinned-version> best-present "..."
 ```
+
+## Security / Privacy 注意事項（必讀）
+
+- 此流程會將查詢送到第三方服務（treebuy API）。
+- **不要**把個資或敏感資訊放進 description（姓名、電話、地址、email、身分證字號、訂單編號等）。
+- 先做資料最小化：保留「對象/場合/預算/喜好」，移除可識別個人的細節。
+- `--keywords` 與 `description` 一律以純字串參數傳入，避免 shell 插值或拼接可執行片段。
+- 若在企業/受管環境，優先使用已審核版本（pinned version）與 lockfile 流程。
 
 ## Agent Workflow
 
