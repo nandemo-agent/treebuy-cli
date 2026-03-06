@@ -1,0 +1,15 @@
+#!/usr/bin/env node
+'use strict';
+
+const { program } = require('commander');
+const { version } = require('../package.json');
+
+program
+  .name('treebuy-cli')
+  .description('小樹購 CLI — treebuy.com 命令列工具')
+  .version(version);
+
+// 子指令
+require('../src/commands/featured')(program);
+
+program.parse(process.argv);
