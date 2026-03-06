@@ -16,9 +16,11 @@ npx skills add https://github.com/nandemo-agent/treebuy-cli --skill treebuy-best
 ## 前置需求
 
 ```bash
-npm install -g treebuy-cli
-# 或直接 npx（建議固定版本，避免 latest 漂移）
-npx treebuy-cli@<pinned-version> best-present "..."
+# 建議固定版本安裝
+npm install -g @nandemo-agent/treebuy-cli@0.1.0
+
+# 或直接 npx 固定版本
+npx @nandemo-agent/treebuy-cli@0.1.0 best-present "..."
 ```
 
 ## Security / Privacy 注意事項（必讀）
