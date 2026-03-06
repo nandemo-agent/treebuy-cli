@@ -11,30 +11,29 @@ module.exports = function registerFeatured(program) {
     .command('list')
     .description('列出目前的 Featured Campaign 及商品')
     .option('--kind <kind>', '篩選類型：featured | topic（預設全部）')
-    .option('--json', '以 JSON 格式輸出')
-    .option('--fields <fields>', '指定輸出欄位，逗號分隔（例如 sku,title）')
+    .option('--json', '輸出 JSON array（一次輸出整包）')
+    .option('--ndjson', '輸出 NDJSON（每筆一行，agent/pipe 友好）')
+    .option('--fields <fields>', '指定輸出欄位（僅作用於 products），逗號分隔（例如 sku,title）')
+    .option('--timeout <ms>', 'API timeout（毫秒，預設 10000）', (v) => Number(v), 10000)
     .action(async (opts) => {
-      let data;
-      try {
-        data = await getFeaturedProducts();
-      } catch (err) {
-        process.stderr.write(`Error: ${err.message}\n`);
-        process.exit(1);
+      const allowed = ['featured', 'topic'];
+      if (opts.kind && !allowed.includes(opts.kind)) {
+        throw new Error('--kind 必須是 featured 或 topic');
       }
+
+      const data = await getFeaturedProducts({ timeoutMs: opts.timeout });
+
+      const featuredList = Array.isArray(data?.featured) ? data.featured : [];
+      const topicList = Array.isArray(data?.topic) ? data.topic : [];
 
       // 合併並加上 kind 欄位
       let campaigns = [
-        ...data.featured.map(c => ({ ...c, kind: 'featured' })),
-        ...data.topic.map(c => ({ ...c, kind: 'topic' })),
+        ...featuredList.map(c => ({ ...c, kind: 'featured' })),
+        ...topicList.map(c => ({ ...c, kind: 'topic' })),
       ];
 
       // --kind 篩選
       if (opts.kind) {
-        const allowed = ['featured', 'topic'];
-        if (!allowed.includes(opts.kind)) {
-          process.stderr.write(`Error: --kind 必須是 featured 或 topic\n`);
-          process.exit(1);
-        }
         campaigns = campaigns.filter(c => c.kind === opts.kind);
       }
 
@@ -55,11 +54,14 @@ module.exports = function registerFeatured(program) {
         }),
       }));
 
-      if (opts.json || !process.stdout.isTTY) {
-        // Non-TTY / --json：NDJSON，每個 campaign 一行
+      if (opts.ndjson || (!opts.json && !process.stdout.isTTY)) {
+        // Non-TTY（預設）或 --ndjson：NDJSON，每個 campaign 一行
         for (const item of output) {
           process.stdout.write(JSON.stringify(item) + '\n');
         }
+      } else if (opts.json) {
+        // --json：JSON array
+        process.stdout.write(JSON.stringify(output, null, 2) + '\n');
       } else {
         // Human-readable
         for (const c of output) {
