@@ -16,15 +16,12 @@ npx skills add https://github.com/nandemo-agent/treebuy-cli --skill treebuy-best
 ## 前置需求
 
 ```bash
-# 安裝 treebuy-cli
 npm install -g treebuy-cli
 # 或直接 npx
 npx treebuy-cli best-present "..."
 ```
 
 ## Agent Workflow
-
-**這個 skill 最重要的一點：你（agent）自己就是最好的 keyword planner。**
 
 ### Step 1 — 分析用戶描述
 
@@ -51,7 +48,6 @@ npx treebuy-cli best-present "..."
 ### Step 3 — 呼叫 CLI
 
 ```bash
-# 用 --keywords 傳入你組好的關鍵字（bypass 規則式展開）
 treebuy-cli best-present "<用戶原始描述>" \
   --keywords "<kw1>,<kw2>,<kw3>,..." \
   --budget <number> \
@@ -70,34 +66,53 @@ treebuy-cli best-present "<用戶原始描述>" \
 | `--ndjson` | 每筆一行 NDJSON | — |
 | `--fields` | 只輸出指定欄位（作用於 recommendations[]） | 全部 |
 
-### Step 4 — 後處理輸出
+### Step 4 — 輸出規範（user-facing 回覆）
 
-CLI 輸出格式（`--json`）：
+**MUST** 每筆推薦包含以下資訊：
 
-```json
-{
-  "input": {"description": "...", "budget": 1000, "count": 5},
-  "planner": "agent",
-  "keywords_used": ["保養品", "香氛蠟燭", "..."],
-  "recommendations": [
-    {
-      "sku": "S251021874L1",
-      "name": "光影香氛蠟燭",
-      "selling_price": 499,
-      "source_keyword": "香氛蠟燭",
-      "category_key": "119",
-      "in_stock": true,
-      "brand": "Besthot",
-      "image_url": "https://img.treebuy-groot.com/..."
-    }
-  ]
-}
+| 欄位 | 說明 |
+|------|------|
+| `name` | 商品名稱（主體） |
+| `selling_price` | 售價（NT$） |
+| `product_url` | 可點擊的商品頁連結 |
+| `reason` | 一句話推薦理由，連結用戶的需求/場合/對象 |
+
+**SHOULD**：`sku` 置於次要資訊，不作為回覆主體。
+
+#### ✅ Good response
+
+```
+1. 光影香氛蠟燭（NT$ 499）
+   送媽媽的母親節禮物，溫暖氛圍感十足，適合居家放鬆。
+   👉 https://www.treebuy.com/products/S251021874L1
+
+2. 棉質絲巾（NT$ 580）
+   實用又有質感，媽媽日常搭配或外出都適合。
+   👉 https://www.treebuy.com/products/S23020356755
 ```
 
-**你（agent）可以在此基礎上：**
-- 為每筆推薦補上一句推薦理由
-- 根據用戶喜好排序
-- 整理成自然語言回覆
+#### ❌ Bad response
+
+```
+1. SKU: S251021874L1, price: 499, category: 119
+2. S23020356755 - 棉質絲巾 - 580元
+```
+
+---
+
+### Step 5 — agent 自行補上 reason
+
+CLI 輸出的 `recommendations[]` 不含 `reason`，由 agent 根據以下資訊生成：
+- 用戶的原始描述（對象/場合/喜好）
+- 商品的 `name`、`brand`、`selling_price`
+- 來源 `source_keyword`（反映搜尋意圖）
+
+**reason 撰寫原則：**
+- 繁中，≤ 30 字
+- 明確連結用戶需求（「送媽媽」「適合登山」「婚禮伴手禮」）
+- 不要空泛（避免「品質不錯」「值得購買」）
+
+---
 
 ## 完整範例
 
@@ -112,15 +127,15 @@ treebuy-cli best-present "朋友喜歡登山，預算 2000" \
   --keywords "登山背包,保溫水壺,運動襪,能量補給,登山帽" \
   --budget 2000 --json
 
-# 範例 3：只看 sku/name/price
+# 範例 3：只看 name/price/url
 treebuy-cli best-present "送同事禮物 500 元以內" \
   --keywords "馬克杯,茶葉,零食禮盒,文具,手帕" \
-  --budget 500 --fields sku,name,selling_price --ndjson
+  --budget 500 --fields name,selling_price,product_url --ndjson
 ```
 
 ## 錯誤處理
 
-- `--keywords` 驗證失敗 → stderr + exit 1（**不** silently fallback，確保 agent 知道 keywords 未生效）
+- `--keywords` 驗證失敗 → stderr + exit 1（不 silently fallback）
 - 找不到符合預算的商品 → stderr + exit 1
 - 單一 keyword 搜尋失敗 → 跳過（不影響其他 keyword）
 
@@ -130,9 +145,10 @@ treebuy-cli best-present "送同事禮物 500 元以內" \
 
 | 欄位 | 型別 | 說明 |
 |------|------|------|
-| `sku` | string | 商品 SKU |
+| `sku` | string | 商品 SKU（次要資訊） |
 | `name` | string | 商品名稱 |
 | `selling_price` | number | 售價 |
+| `product_url` | string | 商品頁連結（`treebuy.com/products/<sku>`） |
 | `source_keyword` | string | 來源關鍵字 |
 | `category_key` | string | 商品分類 key |
 | `in_stock` | boolean | 是否有庫存 |

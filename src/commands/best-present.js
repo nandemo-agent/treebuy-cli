@@ -108,6 +108,7 @@ function dedupeAndRank(items, budget, count, debug) {
       sku: best.product.id,
       name: best.product.name,
       selling_price: best.price,
+      product_url: `https://www.treebuy.com/products/${best.product.id}`,
       source_keyword: best.source_keyword,
       category_key: catKey,
       in_stock: best.product.in_stock ?? null,
@@ -225,8 +226,8 @@ module.exports = function registerBestPresent(program) {
             console.log(`\n  ${i + 1}. ${r.name}`);
             if (r.selling_price !== undefined) console.log(`     售價：NT$ ${r.selling_price}`);
             if (r.brand) console.log(`     品牌：${r.brand}`);
-            console.log(`     SKU：${r.sku}`);
-            console.log(`     關鍵字：${r.source_keyword}  分類：${r.category_key}`);
+            if (r.product_url) console.log(`     連結：${r.product_url}`);
+            console.log(`     SKU：${r.sku}  關鍵字：${r.source_keyword}`);
           }
           console.log('\n' + '─'.repeat(60) + '\n');
         }
