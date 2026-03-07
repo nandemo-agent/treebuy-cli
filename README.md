@@ -4,11 +4,33 @@
 
 ## 安裝
 
+**推薦：使用 npm 全域安裝（固定版本）**
+
 ```bash
-npm install -g treebuy-cli
-# 或直接 clone 使用
-npm install
+npm install -g @nandemo-agent/treebuy-cli@0.1.0
 ```
+
+**或使用 npx（無需全域安裝）**
+
+```bash
+npx @nandemo-agent/treebuy-cli@0.1.0 <command>
+```
+
+**開發用途（本地 clone）**
+
+```bash
+git clone https://github.com/nandemo-agent/treebuy-cli.git
+cd treebuy-cli
+npm install
+npm link  # 建立 global symlink
+```
+
+> 💡 **為什麼固定版本？**  
+> - 確保行為穩定，避免 breaking changes  
+> - 方便 audit 與 security review  
+> - 明確知道使用哪個版本的功能與 schema  
+> 
+> 如需最新版本，請查看 [npm package 頁面](https://www.npmjs.com/package/@nandemo-agent/treebuy-cli)
 
 ## 使用方式
 
