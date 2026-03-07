@@ -1,6 +1,6 @@
 {
   "name": "@nandemo-agent/treebuy-cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "小樹購 CLI — treebuy.com 命令列工具",
   "bin": {
     "treebuy-cli": "bin/treebuy-cli.js"
