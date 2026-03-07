@@ -24,6 +24,8 @@ npm install -g @nandemo-agent/treebuy-cli@0.1.0
 npx @nandemo-agent/treebuy-cli@0.1.0 <command>
 ```
 
+> 如需最新版本，請查看 [npm package 頁面](https://www.npmjs.com/package/@nandemo-agent/treebuy-cli)
+
 **為什麼固定版本？**  
 - 確保行為穩定，避免 breaking changes
 - 方便 audit 與 security review
@@ -59,11 +61,13 @@ npx @nandemo-agent/treebuy-cli@0.1.0 <command>
 ✅ 良好：「30歲男性，喜歡運動，預算3000以內的生日禮物」
 ```
 
-## Global Flags
+## Common Flags
 
-目前 treebuy-cli 各指令的共用 flags:
+treebuy-cli 多數指令支援以下常用 flags（具體請執行 `<command> --help` 確認）：
 
-- `--format <format>` — 輸出格式 (json, table, csv 等，依指令而異)
+- `--json` — 完整 JSON 輸出（含 meta）
+- `--ndjson` — 每筆一行 NDJSON
+- `--fields <fields>` — 只輸出指定欄位（逗號分隔）
 - `--help` — 顯示指令說明
 
 詳細請參考各指令的 `--help` 輸出。
