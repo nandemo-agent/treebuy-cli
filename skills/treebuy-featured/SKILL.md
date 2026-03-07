@@ -5,6 +5,8 @@ description: "查詢小樹購（treebuy.com）目前的 Featured Campaign 商品
 
 # treebuy-featured
 
+**PREREQUISITE:** Read [../treebuy-shared/SKILL.md](../treebuy-shared/SKILL.md) for installation, authentication, and security rules.
+
 用 `treebuy-cli featured list` 取得小樹購目前的 Featured Campaign。
 
 ## 安裝
@@ -12,10 +14,6 @@ description: "查詢小樹購（treebuy.com）目前的 Featured Campaign 商品
 ```bash
 # 透過 npx skills add 安裝此技能
 npx skills add https://github.com/nandemo-agent/treebuy-cli --skill treebuy-featured
-
-# 或直接使用固定版本的 CLI（建議）
-npm install -g @nandemo-agent/treebuy-cli@0.1.0
-# 或：npx @nandemo-agent/treebuy-cli@0.1.0 featured list
 ```
 
 ## 指令
